@@ -68,12 +68,12 @@ class AdvancedNLPModule:
             'telephone': r'\b0[567]\d{8}\b'
         }
         
-        # Charger CamemBERT - TEMPORAIREMENT DÉSACTIVÉ POUR TESTS
+        # Charger CamemBERT/mBERT
         self.camembert_model = None
         self.tokenizer = None
-        # self._load_camembert()  # Désactivé temporairement
+        self._load_camembert()  # ✅ Activé pour évaluation complète
         
-        logger.info("✓ Module NLP initialisé (sans mBERT - mode keywords only)")
+        logger.info("✓ Module NLP initialisé avec mBERT")
     
     def _load_camembert(self):
         """Charge le modèle mBERT (multilingual: French + Arabic + 100+ languages)"""

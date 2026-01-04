@@ -1,149 +1,251 @@
-# Document Classifier - Multimodal AI System
+# 📄 Document Classifier - INDIA-S5
 
-Système de classification multimodal de documents administratifs marocains utilisant PyTorch, Transformers et OpenCV.
+Système de classification automatique de documents administratifs marocains utilisant une approche multimodale (CV + NLP + Gabarits).
 
-## 📋 Catégories Supportées
+## 🎯 Classes supportées
 
-- 🏦 Relevés bancaires
-- ⚡ Factures d'électricité
-- 💧 Factures d'eau
+- **Facture Eau** (RADEM, Lydec, Redal)
+- **Facture Électricité** (ONE, RADEM, Lydec)
+- **Relevé Bancaire** (Attijariwafa, BMCE, CIH, etc.)
+
+## 📊 Performances (sur 252 images de validation)
+
+| Module                     | Accuracy | F1-score | Temps |
+| -------------------------- | -------- | -------- | ----- |
+| **CV seul (ResNet50)**     | 61.11%   | 0.5845   | 6s    |
+| **NLP (mBERT + Keywords)** | ~42-45%  | ~0.41    | 2s    |
+| **Gabarits (Règles)**      | ~46-50%  | ~0.47    | 1s    |
+| **Fusion multimodale**     | 61.51%   | 0.5872   | 7s    |
+
+### Performances par classe (CV)
+
+| Classe              | Précision | Recall | F1-score | Support |
+| ------------------- | --------- | ------ | -------- | ------- |
+| Facture Eau         | 0.5476    | 0.3651 | 0.4375   | 63      |
+| Facture Électricité | 0.6825    | 0.6825 | 0.6825   | 126     |
+| Relevé Bancaire     | 0.7143    | 0.7143 | 0.7143   | 63      |
 
 ## 🏗️ Architecture
 
-- **Vision (CV)**: ResNet50 fine-tuné + 36 features structurelles
-- **Texte (NLP)**: Analyse de keywords + Embeddings mBERT
-- **Layout (Gabarits)**: Détection tableaux, logos, signatures
-- **Fusion**: Combinaison multimodale intelligente (CV 40% + NLP 35% + Gabarits 25%)
+### Frontend
+
+- **Interface web** : HTML/CSS/JavaScript
+- **Upload d'images** : drag-and-drop
+- **Affichage résultats** : classe prédite + confiance
+
+### Backend (Flask)
+
+- **app.py** : Serveur REST API
+- **final_inference.py** : Pipeline d'inférence complet
+- **Modules** :
+  - `cv_module_v2.py` : ResNet50 fine-tuné
+  - `nlp_module.py` : mBERT + keywords matching
+  - `gabarits_module.py` : Analyse structurelle
+  - `fusion_module.py` : Fusion multimodale pondérée
+
+### Modèles entraînés
+
+- **hybrid_resnet50.pth** : Modèle CV principal (61.11% acc)
+- **model_epoch_01_valacc_67.0635.pth** : Meilleur checkpoint
 
 ## 🚀 Installation
 
 ### Prérequis
 
 - Python 3.9+
-- Tesseract OCR
-- Poppler (pour PDF)
+- pip
 
-### Dépendances
+### Installation des dépendances
 
 ```bash
-pip install -r backend/requirements.txt
+cd backend
+pip install -r requirements.txt
 ```
 
-### Tesseract (Windows)
+### Téléchargement des modèles
 
-1. Télécharger: https://github.com/UB-Mannheim/tesseract/wiki
-2. Installer dans `C:\Program Files\Tesseract-OCR\`
+Les modèles mBERT et ResNet50 sont téléchargés automatiquement au premier lancement.
 
-### Poppler (Windows)
+## ▶️ Lancement
 
-1. Télécharger: http://blog.alivate.com.au/poppler-windows/
-2. Extraire dans `C:\poppler\`
+### Démarrage automatique (frontend + backend)
 
-## 📁 Structure du Projet
-
-```
-document-classifier/
-├── backend/
-│   ├── app.py              # API Flask
-│   ├── config.py           # Configuration
-│   ├── train_hybrid.py     # Entraînement modèle
-│   ├── modules/            # Modules de classification
-│   │   ├── ocr_module.py
-│   │   ├── nlp_module.py
-│   │   ├── cv_module_v2.py
-│   │   ├── gabarits_module.py
-│   │   └── fusion_module.py
-│   └── utils/
-├── frontend/
-│   ├── index_new.html      # Interface web
-│   └── style.css
-├── data/                   # Datasets (gitignored)
-└── models/                 # Modèles entraînés (gitignored)
+```bash
+python start_servers.py
 ```
 
-## 🎯 Utilisation
+### Démarrage manuel
 
-### 1. Démarrer le Backend
+**Backend** (terminal 1):
 
 ```bash
 cd backend
 python app.py
 ```
 
-Backend accessible sur: http://localhost:5000
-
-### 2. Démarrer le Frontend
+**Frontend** (terminal 2):
 
 ```bash
 cd frontend
 python -m http.server 8000
 ```
 
-Interface accessible sur: http://localhost:8000/index_new.html
+Puis ouvrir [http://localhost:8000/index_new.html](http://localhost:8000/index_new.html)
 
-### 3. Utiliser l'API
+## 📁 Structure du projet
 
-```python
-import requests
-
-with open('document.pdf', 'rb') as f:
-    response = requests.post('http://localhost:5000/api/classify',
-                           files={'file': f})
-    result = response.json()
-    print(f"Classe: {result['classification']}")
-    print(f"Confiance: {result['confidence_globale']:.2%}")
+```
+document-classifier/
+├── frontend/              # Interface web
+│   ├── index_new.html    # Interface principale
+│   ├── app.js            # Logique frontend
+│   └── style.css         # Styles
+├── backend/
+│   ├── app.py            # Serveur Flask (API REST)
+│   ├── final_inference.py # Pipeline d'inférence
+│   ├── calculate_metrics.py # Calcul des métriques
+│   ├── evaluate_fusion.py   # Évaluation fusion
+│   ├── evaluate_all_modules.py # Évaluation complète
+│   ├── config.py         # Configuration
+│   ├── requirements.txt  # Dépendances Python
+│   ├── modules/          # Modules de classification
+│   │   ├── cv_module_v2.py      # Module vision (ResNet50)
+│   │   ├── nlp_module.py        # Module NLP (mBERT)
+│   │   ├── gabarits_module.py   # Module gabarits
+│   │   ├── fusion_module.py     # Fusion multimodale
+│   │   └── ocr_module.py        # Extraction texte (Tesseract)
+│   ├── models/cv/        # Modèles entraînés
+│   │   ├── hybrid_resnet50.pth  # Modèle principal
+│   │   └── *.json        # Résultats d'évaluation
+│   └── utils/            # Utilitaires
+│       ├── image_preprocessor.py
+│       └── model_manager.py
+├── data/                 # Données originales (12 images)
+├── data_augmented/       # Données augmentées (252 images)
+│   ├── train/            # 80% (202 images)
+│   └── val/              # 20% (50 images → augmenté à 252)
+├── Dataset/              # Dataset brut
+├── uploads/              # Uploads utilisateurs
+├── scripts/              # Scripts utilitaires
+└── README_LATEX_REPORT.tex  # Rapport LaTeX complet
 ```
 
-## 📊 Entraînement du Modèle
+## 🔧 Scripts disponibles
 
-### Avec Augmentation de Données
+### Évaluation des performances
 
 ```bash
-python backend/train_hybrid.py \
-    --data-dir data_augmented \
-    --epochs 60 \
-    --batch-size 16 \
-    --lr 0.001
+cd backend
+
+# Calculer les métriques détaillées (CV seul)
+python calculate_metrics.py
+
+# Évaluer la fusion multimodale
+python evaluate_fusion.py
+
+# Évaluer tous les modules (CV, NLP, Gabarits, Fusion)
+python evaluate_all_modules.py
 ```
 
-### Sur Google Colab
+### Résultats sauvegardés
 
-Utiliser le notebook `COLAB_TRAINING.ipynb` pour entraînement GPU gratuit.
+Les évaluations génèrent des fichiers JSON dans `backend/models/cv/`:
 
-## 🔧 Configuration
+- `detailed_metrics.json` : Métriques par classe (CV)
+- `fusion_evaluation.json` : Comparaison CV vs Fusion
+- `complete_evaluation.json` : Tous les modules
 
-Modifier `backend/config.py`:
+## 🌐 API Endpoints
 
-- Chemins Tesseract/Poppler
-- Seuils de confiance
-- Poids de fusion multimodale
-- Catégories de documents
+### `POST /predict`
 
-## 📈 Performance
+Classifier un document uploadé
 
-Avec dataset augmenté (~900 images):
+**Request:**
 
-- **Accuracy attendue**: 60-75%
-- **Temps de traitement**: 3-5s (image), 8-12s (PDF)
-- **Seuil d'acceptation**: 50%
+```json
+{
+  "file": "<image file>"
+}
+```
 
-## 🔍 Endpoints API
+**Response:**
 
-- `GET /api/health` - État du système
-- `POST /api/classify` - Classification d'un document
-- `POST /api/batch` - Classification par batch
-- `GET /api/categories` - Liste des catégories
+```json
+{
+  "class": "facture_electricite",
+  "confidence": 0.85,
+  "module_scores": {
+    "cv": 0.82,
+    "nlp": 0.65,
+    "gabarits": 0.7
+  }
+}
+```
 
-## 🛠️ Technologies
+## 📈 Améliorations possibles
 
-- **Backend**: Flask, PyTorch, Transformers, OpenCV, Tesseract
-- **Frontend**: HTML/CSS/JS, Chart.js
-- **Models**: ResNet50, mBERT (bert-base-multilingual-cased)
+### Court terme (+2-4%)
 
-## 📝 Licence
+- Fine-tuner mBERT sur 1000+ documents annotés
+- Enrichir les templates de gabarits
+- Optimiser la pondération de fusion (grid search)
 
-Projet académique - INDIA-S5
+### Moyen terme (+5-10%)
 
-## 👥 Contribution
+- Data augmentation avancée (rotation, perspective, bruit)
+- Utiliser CamemBERT ou LayoutLM pour le NLP
+- Ensemble de plusieurs modèles CV (ResNet50 + EfficientNet)
 
-Projet développé dans le cadre du module INDIA à l'ENSIAS.
+### Long terme (+10-20%)
+
+- Approche end-to-end multimodale (ViT + BERT)
+- Active learning pour annoter les cas difficiles
+- Transfer learning depuis modèles pré-entraînés sur documents administratifs
+
+## 📝 Notes techniques
+
+### Limites actuelles
+
+- **Facture Eau** : Performances faibles (36.51% F1) dues au déséquilibre de classe et à la confusion avec les factures d'électricité
+- **NLP** : Pas fine-tuné, utilise uniquement similarité d'embeddings + keywords
+- **Gabarits** : Règles heuristiques génériques, pas de ML
+- **Fusion** : Gain modeste (+0.40%) car modules complémentaires non optimisés
+
+### Dataset
+
+- **Original** : 12 images (4 par classe)
+- **Augmenté** : 252 images (augmentation de données x21)
+- **Split** : 80% train (202) / 20% val (50 → 252 avec augmentation)
+
+## 📄 Fichiers du projet
+
+### Fichiers essentiels à garder
+
+- ✅ `frontend/` - Interface web complète
+- ✅ `backend/app.py` - Serveur Flask API
+- ✅ `backend/modules/` - Les 3 modules (CV, NLP, Gabarits) + Fusion
+- ✅ `backend/models/cv/` - Modèles entraînés (.pth)
+- ✅ `backend/final_inference.py` - Pipeline production
+- ✅ `backend/calculate_metrics.py` - Évaluation métriques
+- ✅ `backend/evaluate_fusion.py` - Test fusion multimodale
+- ✅ `data/`, `data_augmented/`, `Dataset/` - Datasets
+- ✅ `start_servers.py` - Lancement automatique
+- ✅ `README_LATEX_REPORT.tex` - Rapport complet LaTeX
+
+### Fichiers supprimés (nettoyage effectué)
+
+- ❌ `__pycache__/` - Caches Python
+- ❌ `train_fast.py`, `train_hybrid.py` - Scripts training (terminé)
+- ❌ `prepare_dataset.py`, `preprocess_pipeline.py` - Preprocessing (fait)
+- ❌ `evaluate_model.py`, `evaluate_nlp.py`, `evaluate_gabarits.py` - Dupliqués
+- ❌ `backend/models/cv/checkpoints/` - Vieux checkpoints
+- ❌ `logs/`, `results/`, `models/` - Fichiers temporaires
+
+## 👥 Équipe
+
+Projet INDIA-S5 - Classification de Documents Administratifs Marocains
+
+## 📄 Licence
+
+Projet académique - ENSIAS 2026
