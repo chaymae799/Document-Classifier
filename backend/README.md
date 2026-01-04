@@ -1,8 +1,7 @@
 # 📄 Système de Classification de Documents Administratifs
 
 **Projet:** INDIA-S5 - Module CV/NLP  
-**Professeur:** Pr. CHEFIRA  
-**Année:** 2024-2025
+
 
 ---
 
