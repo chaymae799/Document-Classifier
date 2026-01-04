@@ -233,19 +233,6 @@ Classifier un document uploadé
 - ✅ `start_servers.py` - Lancement automatique
 - ✅ `README_LATEX_REPORT.tex` - Rapport complet LaTeX
 
-### Fichiers supprimés (nettoyage effectué)
 
-- ❌ `__pycache__/` - Caches Python
-- ❌ `train_fast.py`, `train_hybrid.py` - Scripts training (terminé)
-- ❌ `prepare_dataset.py`, `preprocess_pipeline.py` - Preprocessing (fait)
-- ❌ `evaluate_model.py`, `evaluate_nlp.py`, `evaluate_gabarits.py` - Dupliqués
-- ❌ `backend/models/cv/checkpoints/` - Vieux checkpoints
-- ❌ `logs/`, `results/`, `models/` - Fichiers temporaires
 
-## 👥 Équipe
 
-Projet INDIA-S5 - Classification de Documents Administratifs Marocains
-
-## 📄 Licence
-
-Projet académique - ENSIAS 2026
