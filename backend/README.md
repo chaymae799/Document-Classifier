@@ -680,29 +680,6 @@ print(f"Confiance : {result['confidence']:.2%}")
 - Translation (±10%)
 - Multiplication ×20 par image originale
 
-## 📄 Fichiers du projet
-
-### Fichiers essentiels à garder
-
-- ✅ `frontend/` - Interface web complète
-- ✅ `backend/app.py` - Serveur Flask API
-- ✅ `backend/modules/` - Les 3 modules (CV, NLP, Gabarits) + Fusion
-- ✅ `backend/models/cv/` - Modèles entraînés (.pth)
-- ✅ `backend/final_inference.py` - Pipeline production
-- ✅ `backend/calculate_metrics.py` - Évaluation métriques
-- ✅ `backend/evaluate_fusion.py` - Test fusion multimodale
-- ✅ `data/`, `data_augmented/`, `Dataset/` - Datasets
-- ✅ `start_servers.py` - Lancement automatique
-- ✅ `README_LATEX_REPORT.tex` - Rapport complet LaTeX
-
-### Fichiers supprimés (nettoyage effectué)
-
-- ❌ `__pycache__/` - Caches Python
-- ❌ `train_fast.py`, `train_hybrid.py` - Scripts training (terminé)
-- ❌ `prepare_dataset.py`, `preprocess_pipeline.py` - Preprocessing (fait)
-- ❌ `evaluate_model.py`, `evaluate_nlp.py`, `evaluate_gabarits.py` - Dupliqués
-- ❌ `backend/models/cv/checkpoints/` - Vieux checkpoints
-- ❌ `logs/`, `results/`, `models/` - Fichiers temporaires
 
 ---
 
