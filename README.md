@@ -741,29 +741,3 @@ Ce projet illustre comment l'**Intelligence Artificielle**, lorsqu'elle est corr
 
 **ROI estimé** : Réduction de **60-85% du temps de traitement manuel** selon secteur, avec **amélioration de la traçabilité** et **diminution des erreurs humaines** (taux d'erreur < 5% vs 15-20% manuel).
 
----
-
-## 📚 Références Scientifiques
-
-1. **He, K., et al. (2016)**. Deep Residual Learning for Image Recognition. _CVPR 2016_.
-2. **Devlin, J., et al. (2019)**. BERT: Pre-training of Deep Bidirectional Transformers. _NAACL 2019_.
-3. **Smith, R. (2007)**. An Overview of the Tesseract OCR Engine. _ICDAR 2007_.
-4. **Baltrušaitis, T., et al. (2019)**. Multimodal Machine Learning: A Survey. _IEEE TPAMI 41(2)_.
-5. **Dosovitskiy, A., et al. (2020)**. An Image is Worth 16x16 Words: Transformers for Image Recognition. _ICLR 2021_.
-6. **Harley, A. W., et al. (2015)**. Evaluation of Deep CNNs for Document Image Classification. _ICDAR 2015_.
-
----
-
-## 📄 Licence et Contact
-
-**Projet académique** - École Nationale Supérieure d'Informatique et d'Analyse des Systèmes (ENSIAS)
-
-**Année universitaire** : 2025/2026
-
-**Module** : INDIA-S5 - Intelligence Artificielle
-
-**Encadrant** : Pr. Reda CHEFIRA
-
----
-
-_Développé avec passion pour contribuer à la transformation digitale du Maroc_ 🇲🇦
