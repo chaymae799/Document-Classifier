@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Document Classifier</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+      }
+      header h1 {
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+      }
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      }
+      .upload-area {
+        border: 3px dashed #667eea;
+        border-radius: 12px;
+        padding: 48px;
+        text-align: center;
+        background: linear-gradient(to bottom, #f8f9ff, #ffffff);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+      }
+      .upload-area:hover {
+        border-color: #764ba2;
+        background: #e8efff;
+      }
+      .upload-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        pointer-events: none;
+      }
+      .upload-text {
+        font-size: 1.3rem;
+        color: #555;
+        margin-bottom: 8px;
+        pointer-events: none;
+      }
+      .upload-hint {
+        color: #888;
+        pointer-events: none;
+      }
+      #fileInput {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 16px;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .progress {
+        text-align: center;
+        margin-top: 24px;
+      }
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none !important;
+      }
+      .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .result-header h2 {
+        color: #667eea;
+        font-size: 1.8rem;
+      }
+      .classification-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        text-align: center;
+      }
+      .class-name {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+      .confidence-percent {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+      .result-section {
+        background: #f8f9ff;
+        padding: 24px;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        margin-bottom: 24px;
+      }
+      .result-section h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+      }
+      .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      .module-box {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+      }
+      .module-box.high-score {
+        border-color: #667eea;
+        background: linear-gradient(to bottom, #f8f9ff, white);
+      }
+      .module-title {
+        font-size: 0.95rem;
+        color: #888;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      .module-score {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+      .module-class {
+        font-size: 0.9rem;
+        color: #555;
+        font-weight: 600;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      .info-item {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+      }
+      .info-label {
+        display: block;
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 6px;
+      }
+      .info-value {
+        display: block;
+        font-size: 1.3rem;
+        color: #333;
+        font-weight: 700;
+      }
+      .json-display {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 20px;
+        border-radius: 8px;
+        overflow: auto;
+        max-height: 400px;
+        font-family: monospace;
+        font-size: 0.9rem;
+      }
+      .chart-container {
+        position: relative;
+        height: 300px;
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      #preview {
+        text-align: center;
+      }
+      #preview img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>📄 Document Classifier</h1>
+        <p>Analyse intelligente de documents avec IA</p>
+      </header>
+
+      <main>
+        <div class="card">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">Glissez votre document ici</div>
+            <div class="upload-hint">
+              ou cliquez pour sélectionner (JPG, PNG, PDF)
+            </div>
+            <input id="fileInput" type="file" accept="image/*,.pdf" />
+          </div>
+          <div
+            id="fileInfo"
+            class="hidden"
+            style="
+              background: #f0f0f0;
+              padding: 12px;
+              border-radius: 8px;
+              margin: 16px 0;
+            "
+          >
+            <strong>Fichier:</strong> <span id="fileName"></span>
+          </div>
+          <button class="btn" id="uploadBtn" disabled>🔍 Analyser</button>
+          <div id="progress" class="progress hidden">
+            <div class="spinner"></div>
+            <div>Analyse en cours...</div>
+          </div>
+        </div>
+
+        <div class="card" id="preview" style="display: none">
+          <h2>🖼️ Aperçu</h2>
+          <img id="previewImg" src="" alt="preview" />
+        </div>
+
+        <div class="card" id="result" style="display: none">
+          <div class="result-header">
+            <h2>✨ Résultat</h2>
+            <div class="classification-badge">
+              <span class="class-name" id="className">-</span>
+              <span class="confidence-percent" id="confidencePercent">0%</span>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <h3>📊 Confiance par Catégorie</h3>
+            <div class="chart-container">
+              <canvas id="confidenceChart"></canvas>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <h3>🧠 Scores des Modules</h3>
+            <div class="modules-grid">
+              <div class="module-box" id="moduleCV">
+                <div class="module-title">Vision</div>
+                <div class="module-score" id="scoreCV">-</div>
+                <div class="module-class" id="classCV">-</div>
+              </div>
+              <div class="module-box" id="moduleNLP">
+                <div class="module-title">Texte</div>
+                <div class="module-score" id="scoreNLP">-</div>
+                <div class="module-class" id="classNLP">-</div>
+              </div>
+              <div class="module-box" id="moduleGabarits">
+                <div class="module-title">Layout</div>
+                <div class="module-score" id="scoreGabarits">-</div>
+                <div class="module-class" id="classGabarits">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <h3>⏱️ Traitement</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Temps total:</span>
+                <span class="info-value" id="processingTime">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">OCR Confidence:</span>
+                <span class="info-value" id="ocrConfidence">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Statut:</span>
+                <span class="info-value" id="shouldReject">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Pages:</span>
+                <span class="info-value" id="pagesCount">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <h3>📋 JSON</h3>
+            <pre id="jsonResult" class="json-display"></pre>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInfo = document.getElementById("fileInfo");
+      const fileName = document.getElementById("fileName");
+      const progress = document.getElementById("progress");
+      const preview = document.getElementById("preview");
+      const previewImg = document.getElementById("previewImg");
+      const resultSection = document.getElementById("result");
+      const jsonResult = document.getElementById("jsonResult");
+
+      const API_BASE = "http://localhost:5000";
+      let confidenceChart = null;
+
+      fileInput.addEventListener("change", handleFileSelect);
+
+      function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+          fileName.textContent = file.name;
+          fileInfo.classList.remove("hidden");
+          uploadBtn.disabled = false;
+        }
+      }
+
+      uploadBtn.addEventListener("click", async () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+
+        if (file.type.startsWith("image/")) {
+          previewImg.src = URL.createObjectURL(file);
+          preview.style.display = "block";
+        } else {
+          preview.style.display = "none";
+        }
+
+        const form = new FormData();
+        form.append("file", file);
+
+        resultSection.style.display = "none";
+        progress.classList.remove("hidden");
+
+        try {
+          const resp = await fetch(`${API_BASE}/api/classify`, {
+            method: "POST",
+            body: form,
+          });
+          const data = await resp.json();
+          displayResults(data);
+          resultSection.style.display = "block";
+          resultSection.scrollIntoView({ behavior: "smooth" });
+        } catch (e) {
+          jsonResult.textContent = "Error: " + e.toString();
+          resultSection.style.display = "block";
+        } finally {
+          progress.classList.add("hidden");
+        }
+      });
+
+      function displayResults(data) {
+        jsonResult.textContent = JSON.stringify(data, null, 2);
+
+        const finalClass = data.classification || "Unknown";
+        const finalScore = data.confidence_globale || 0;
+        const confidencePercent = Math.round(finalScore * 100);
+
+        document.getElementById("className").textContent =
+          formatClassName(finalClass);
+        document.getElementById("confidencePercent").textContent =
+          confidencePercent + "%";
+
+        const cvScore = data.confidence_cv || 0;
+        const nlpScore = data.confidence_nlp || 0;
+        const gabaritsScore = data.confidence_gabarit || 0;
+
+        updateModuleDisplay("CV", cvScore, finalClass);
+        updateModuleDisplay("NLP", nlpScore, finalClass);
+        updateModuleDisplay("Gabarits", gabaritsScore, finalClass);
+
+        if (data.processing_times?.total) {
+          document.getElementById("processingTime").textContent =
+            data.processing_times.total.toFixed(2) + "s";
+        }
+        if (data.metadata?.ocr_confidence !== undefined) {
+          document.getElementById("ocrConfidence").textContent =
+            Math.round(data.metadata.ocr_confidence * 100) + "%";
+        }
+        if (data.should_reject !== undefined) {
+          const status = data.should_reject ? "❌ Rejeté" : "✅ Accepté";
+          const el = document.getElementById("shouldReject");
+          el.textContent = status;
+          el.style.color = data.should_reject ? "#e74c3c" : "#27ae60";
+        }
+        document.getElementById("pagesCount").textContent = "1";
+
+        createConfidenceChart(data);
+      }
+
+      function updateModuleDisplay(moduleName, score, className) {
+        const moduleId = "module" + moduleName;
+        const scoreId = "score" + moduleName;
+        const classId = "class" + moduleName;
+
+        document.getElementById(scoreId).textContent =
+          Math.round(score * 100) + "%";
+        document.getElementById(classId).textContent =
+          formatClassName(className);
+
+        const moduleEl = document.getElementById(moduleId);
+        if (score > 0.6) {
+          moduleEl.classList.add("high-score");
+        } else {
+          moduleEl.classList.remove("high-score");
+        }
+      }
+
+      function createConfidenceChart(data) {
+        const ctx = document.getElementById("confidenceChart");
+        if (!ctx) return;
+
+        const allScores = data.all_scores || {};
+
+        // Filtrer pour ne garder que les 3 classes actives
+        const activeClasses = [
+          "releve_bancaire",
+          "facture_electricite",
+          "facture_eau",
+        ];
+        const filteredScores = {};
+        activeClasses.forEach((cls) => {
+          if (allScores[cls] !== undefined) {
+            filteredScores[cls] = allScores[cls];
+          }
+        });
+
+        const labels = Object.keys(filteredScores).map(formatClassName);
+        const scores = Object.values(filteredScores).map((s) =>
+          Math.round(s * 100)
+        );
+
+        if (confidenceChart) confidenceChart.destroy();
+
+        confidenceChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Confiance",
+                data: scores,
+                backgroundColor: "rgba(102, 126, 234, 0.7)",
+                borderColor: "rgba(102, 126, 234, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, max: 100 },
+            },
+          },
+        });
+      }
+
+      function formatClassName(className) {
+        if (!className) return "Unknown";
+        return className
+          .replace(/_/g, " ")
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      }
+    </script>
+  </body>
+</html>

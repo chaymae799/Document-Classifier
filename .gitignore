@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Models (trop lourds pour GitHub)
+models/
+*.pth
+*.h5
+*.pkl
+*.joblib
+
+# Data (images et datasets)
+data/
+data_augmented/
+Dataset/
+uploads/
+results/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Training outputs
+checkpoints/
+training_results.json
+evaluation_results.json
+preprocessing_report.json
+dry_run_report.json
+
+# Documentation temporaire
+COLAB_INSTRUCTIONS.md
+COLAB_TRAINING.ipynb
+CONVERSION_GUIDE.md
+GUIDE_ORAL.md
+INSTALL_ARABIC_OCR.md
+MULTILINGUAL_UPGRADE.md
+PREPROCESSING_GUIDE.md
+RAPPORT_TECHNIQUE.md
+README_PRESENTATION.md
+report_overleaf.tex
+SLIDES_STRUCTURE.md
+TEST_RESULTS.md
+VIDEO_SCRIPT.md
