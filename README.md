@@ -1,7 +1,5 @@
 # Classification Automatique de Documents Administratifs Marocains
 
-## Projet de Fin d'Études - ENSIAS 2025/2026
-
 ### Approche Multimodale par Fusion CV-NLP-Gabarits
 
 ---
